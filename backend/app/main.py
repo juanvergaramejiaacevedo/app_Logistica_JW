@@ -4,7 +4,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import me, despachos, pedidos, eventos, tracking
+from app.routers import me, auth, despachos, pedidos, eventos, tracking
 
 app = FastAPI(title="Logística JW MVP - API", version="0.1.0")
 
@@ -16,6 +16,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(me.router)
 app.include_router(despachos.router)
 app.include_router(pedidos.router)
