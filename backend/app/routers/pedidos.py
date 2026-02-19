@@ -76,5 +76,5 @@ def pedido_detalle(pedido_id: int, user=Depends(require_role("admin", "operador"
     return {
         "pedido": pedido_data,
         "despacho": despacho_data,                 # puede ser None
-        "ultimos_eventos": eventos_res.data or [], # nombre consistente
+        "eventos": eventos_res.data or [], # nombre consistente
     }
