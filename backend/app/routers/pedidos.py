@@ -85,7 +85,7 @@ def pedido_detalle(pedido_id: int, user=Depends(require_role("admin", "operador"
     }
     
 @router.post("/{pedido_id}/documentos/upload")
-async def upload_documentos_pedido(
+def upload_documentos_pedido(
     pedido_id: int,
     files: list[UploadFile] = File(...),
     user=Depends(require_role("admin", "operador")),
@@ -106,7 +106,7 @@ async def upload_documentos_pedido(
         safe_name = f.filename.replace(" ", "_")
         path = f"despachos/{despacho_id}/pedidos/{pedido_id}/{ts}_{safe_name}"
 
-        content = await f.read()
+        content = f.read()
 
         # 2) Subir a Storage (privado)
         up = supabase_admin.storage.from_(BUCKET).upload(
