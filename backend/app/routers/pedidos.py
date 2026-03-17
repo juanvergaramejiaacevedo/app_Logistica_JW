@@ -1,11 +1,16 @@
 # app/routers/pedidos.py
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, Query, HTTPException
-from app.core.supabase import supabase_user
+import os
+import datetime
+from fastapi import APIRouter, Depends, Query, HTTPException, UploadFile, File
+from app.core.supabase import supabase_user, supabase_admin
 from app.deps.auth import require_role
 from app.schemas.pedidos import PedidoCreate
 from app.schemas.pedido_detalle import PedidoDetalleResponse
+from app.schemas.documentos import PedidoDocumentoOut
+
+BUCKET = "pedido_docs"
 
 router = APIRouter(prefix="/pedidos", tags=["Pedidos"])
 
@@ -78,3 +83,80 @@ def pedido_detalle(pedido_id: int, user=Depends(require_role("admin", "operador"
         "despacho": despacho_data,                 # puede ser None
         "eventos": eventos_res.data or [], # nombre consistente
     }
+    
+@router.post("/{pedido_id}/documentos/upload")
+async def upload_documentos_pedido(
+    pedido_id: int,
+    files: list[UploadFile] = File(...),
+    user=Depends(require_role("admin", "operador")),
+):
+    sb = supabase_user(user["access_token"])
+
+    # 1) Traer pedido para saber despacho_id y validar que exista
+    pres = sb.table("pedidos").select("id, despacho_id").eq("id", pedido_id).execute()
+    if not pres.data:
+        raise HTTPException(404, "Pedido no encontrado")
+    pedido = pres.data[0]
+    despacho_id = pedido.get("despacho_id")
+
+    saved = []
+    for f in files:
+        ext = os.path.splitext(f.filename)[1].lower()
+        ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        safe_name = f.filename.replace(" ", "_")
+        path = f"despachos/{despacho_id}/pedidos/{pedido_id}/{ts}_{safe_name}"
+
+        content = await f.read()
+
+        # 2) Subir a Storage (privado)
+        up = supabase_admin.storage.from_(BUCKET).upload(
+            path,
+            content,
+            {"content-type": f.content_type or "application/octet-stream", "upsert": "true"},
+        )
+
+        # 3) Registrar en tabla pedido_documentos
+        ins = (
+            sb.table("pedido_documentos")
+            .insert({
+                "pedido_id": pedido_id,
+                "despacho_id": despacho_id,
+                "bucket": BUCKET,
+                "file_path": path,
+                "file_name": f.filename,
+                "content_type": f.content_type,
+                "size_bytes": len(content),
+                "uploaded_by": user["id"],
+            })
+            .execute()
+        )
+        saved.append(ins.data[0])
+
+    return {"ok": True, "count": len(saved), "items": saved}
+
+
+@router.get("/{pedido_id}/documentos", response_model=list[PedidoDocumentoOut])
+def list_documentos_pedido(
+    pedido_id: int,
+    user=Depends(require_role("admin", "operador", "cliente")),
+):
+    sb = supabase_user(user["access_token"])
+
+    # RLS se encarga de filtrar si es cliente
+    res = (
+        sb.table("pedido_documentos")
+        .select("id,pedido_id,despacho_id,file_name,file_path,content_type,created_at")
+        .eq("pedido_id", pedido_id)
+        .order("created_at", desc=True)
+        .execute()
+    )
+    items = res.data or []
+
+    # generar signed_url por cada documento
+    out = []
+    for it in items:
+        signed = supabase_admin.storage.from_(BUCKET).create_signed_url(it["file_path"], 3600)
+        it["signed_url"] = signed.get("signedURL") if isinstance(signed, dict) else getattr(signed, "signedURL", None)
+        out.append(it)
+
+    return out
