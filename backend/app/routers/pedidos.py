@@ -4,11 +4,11 @@ from __future__ import annotations
 import os
 import datetime
 from fastapi import APIRouter, Depends, Query, HTTPException, UploadFile, File
-from core.supabase import supabase_user, supabase_admin
-from deps.auth import require_role
-from schemas.pedidos import PedidoCreate
-from schemas.pedido_detalle import PedidoDetalleResponse
-from schemas.documentos import PedidoDocumentoOut
+from app.core.supabase import supabase_user, supabase_admin
+from app.deps.auth import require_role
+from app.schemas.pedidos import PedidoCreate
+from app.schemas.pedido_detalle import PedidoDetalleResponse
+from app.schemas.documentos import PedidoDocumentoOut
 
 BUCKET = "pedido_docs"
 

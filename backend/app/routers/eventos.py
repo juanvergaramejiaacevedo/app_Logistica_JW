@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
-from core.supabase import supabase_user
-from deps.auth import require_role
-from schemas.eventos import EventoCreate
+from app.core.supabase import supabase_user
+from app.deps.auth import require_role
+from app.schemas.eventos import EventoCreate
 
 router = APIRouter(prefix="/eventos", tags=["Eventos"])
 

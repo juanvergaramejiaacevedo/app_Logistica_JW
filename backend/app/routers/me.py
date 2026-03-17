@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
-from deps.auth import get_current_user
+from app.deps.auth import get_current_user
 
 router = APIRouter(prefix="/me", tags=["Auth"])
 

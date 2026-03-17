@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends
-from core.supabase import supabase_user
-from deps.auth import require_role
-from schemas.despachos import DespachoCreate
+from app.core.supabase import supabase_user
+from app.deps.auth import require_role
+from app.schemas.despachos import DespachoCreate
 
 router = APIRouter(prefix="/despachos", tags=["Despachos"])
 

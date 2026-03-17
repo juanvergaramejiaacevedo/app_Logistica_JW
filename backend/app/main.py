@@ -4,7 +4,7 @@ from __future__ import annotations
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers import me, auth, despachos, pedidos, eventos, tracking
+from app.routers import me, auth, despachos, pedidos, eventos, tracking
 
 app = FastAPI(title="Logística JW MVP - API", version="0.1.0")
 
