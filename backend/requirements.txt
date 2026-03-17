@@ -5,3 +5,4 @@ requests>=2.31
 supabase>=2.6
 pydantic>=2.6
 pydantic[email]>=2.6
+python-multipart>=0.0.5

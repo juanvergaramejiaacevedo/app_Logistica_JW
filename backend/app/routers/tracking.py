@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
-from app.core.supabase import supabase_user
-from app.deps.auth import require_role
-from app.schemas.tracking import TrackingCreate
+from core.supabase import supabase_user
+from deps.auth import require_role
+from schemas.tracking import TrackingCreate
 
 router = APIRouter(prefix="/tracking", tags=["Tracking"])
 

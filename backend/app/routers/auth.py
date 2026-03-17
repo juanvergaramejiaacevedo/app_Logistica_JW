@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import httpx
 from fastapi import APIRouter, HTTPException, status
-from app.core.config import SUPABASE_URL, SUPABASE_ANON_KEY
-from app.deps.auth import get_current_user
-from app.schemas.auth import LoginRequest, LoginResponse
+from core.config import SUPABASE_URL, SUPABASE_ANON_KEY
+from deps.auth import get_current_user
+from schemas.auth import LoginRequest, LoginResponse
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

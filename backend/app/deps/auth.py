@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Optional, Dict, Any
 from fastapi import Header, HTTPException, status
 
-from app.core.supabase import supabase_admin
+from core.supabase import supabase_admin
 
 
 def _extract_token(authorization: Optional[str]) -> str:
