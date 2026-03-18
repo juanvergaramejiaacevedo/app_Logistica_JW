@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import os
-import datetime
+from datetime import datetime
 from fastapi import APIRouter, Depends, Query, HTTPException, UploadFile, File
 from app.core.supabase import supabase_user, supabase_admin
 from app.deps.auth import require_role
