@@ -23,7 +23,8 @@ def create_cliente(payload: ClienteCreate, user=Depends(require_role("admin", "o
     sb = supabase_user(user["access_token"])
     
     data = payload.model_dump()
-    data["created_by"] = user["id"]
+    
+    #data["created_by"] = user["id"]
     
     res = sb.table("clientes").insert(data).execute()
     
