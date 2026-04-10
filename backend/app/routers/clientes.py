@@ -28,7 +28,10 @@ def create_cliente(payload: ClienteCreate, user=Depends(require_role("admin", "o
     
     res = sb.table("clientes").insert(data).execute()
     
-    if res.error:
-        raise HTTPException(status_code=400, detail=res.error.message)
+    #if res.error:
+        #raise HTTPException(status_code=400, detail=res.error.message)
+   
+    if not res.data:
+        raise HTTPException(status_code=400, detail="Error al crear cliente")
     
-    return res.data[0]
+    return res.data
