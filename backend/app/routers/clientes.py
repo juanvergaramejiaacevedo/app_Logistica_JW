@@ -34,4 +34,4 @@ def create_cliente(payload: ClienteCreate, user=Depends(require_role("admin", "o
     if not res.data:
         raise HTTPException(status_code=400, detail="Error al crear cliente")
     
-    return res.data
+    return res.data[0]
